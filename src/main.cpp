@@ -26,7 +26,7 @@ void setup()   {
     .type = VALUE_INT,
     .i = 0,
     .minVal = 0,
-    .maxVal = INT32_MAX,
+    .maxVal = MAXFLOAT,
     .step = 1,
   };
 
@@ -95,7 +95,7 @@ void setup()   {
     .items = items,
     .itemCount = size(items),
     .currentItem = 1,
-    .scroll = 1
+    .scrollVal = 1
   };
 
   delay(250); // wait for the OLED to power up

@@ -53,8 +53,11 @@ struct Menu {
     struct Menu* parent;
     uint16_t currentItem{};
     bool editing{};
-    uint16_t scroll{}; //Elements
+
+    uint16_t scrollVal{};
+    bool loopScroll{};
+
+    void scroll(uint16_t scrollDelta);
 };
 
-void drawMenu(Adafruit_GFX& display, Menu& menu, uint16_t c, uint16_t bg, uint16_t selc, uint16_t selbg)
-;
+void drawMenu(Adafruit_GFX& display, Menu& menu, uint16_t c, uint16_t bg, uint16_t selc, uint16_t selbg);

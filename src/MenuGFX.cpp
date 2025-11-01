@@ -65,7 +65,7 @@ void drawMenu(Adafruit_GFX& display, Menu& menu, uint16_t c, uint16_t bg, uint16
     display.setCursor(0, newY);
 
     //Draw menu
-    for (size_t i = menu.scroll; i < menu.itemCount; i++)
+    for (size_t i = menu.scrollVal; i < menu.itemCount; i++)
     {
         bool selected = menu.currentItem == i;
         bool editing = selected && menu.editing && menu.items[menu.currentItem].editable;
@@ -92,5 +92,35 @@ void drawMenu(Adafruit_GFX& display, Menu& menu, uint16_t c, uint16_t bg, uint16
         //Adjust item spacing
         int16_t newY = display.getCursorY() + 4; 
         display.setCursor(0, newY);
+    }
+}
+
+void Menu::scroll(uint16_t scrollDelta)
+{
+    scrollVal += scrollDelta;
+
+    
+    
+    if(scrollVal > itemCount){
+        if(loopScroll){
+            while (scrollVal > itemCount) //Should only loop once unless scrollDelta is massive (>itemCount)
+            {
+                scrollVal -= itemCount; 
+            }
+        }
+        else{
+            scrollVal = itemCount; //Clamp value
+        }
+    }
+    else if (scrollVal < 0){
+        if(loopScroll){
+            while (scrollVal < 0) //Should only loop once unless scrollDelta is massive (>itemCount)
+            {
+                scrollVal += itemCount; 
+            }
+        }
+        else{
+            scrollVal = 0; //Clamp value
+        }
     }
 }
