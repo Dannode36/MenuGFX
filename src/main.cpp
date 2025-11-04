@@ -94,20 +94,51 @@ void setup()   {
     .title = "Options",
     .items = items,
     .itemCount = size(items),
-    .currentItem = 1,
-    .scrollVal = 1
+    .selectedItem = 1,
+    .scrollVal = 1,
+    .clampScroll = true,
   };
 
   delay(250); // wait for the OLED to power up
   display.begin(i2c_Address, true); // Address 0x3C default
   //display.setContrast (0); // dim display
   display.clearDisplay();
-  
   drawMenu(display, menu, SH110X_WHITE, SH110X_BLACK, SH110X_BLACK, SH110X_WHITE);
   display.display();
 
+  
+  while (true)
+  {
+      // delay(1000);
+      // menu.scroll(1);
+
+      // display.clearDisplay();
+      // drawMenu(display, menu, SH110X_WHITE, SH110X_BLACK, SH110X_BLACK, SH110X_WHITE);
+      // display.display();
+
+    for (size_t i = 0; i < 6; i++)
+    {
+      delay(1000);
+      menu.scroll(1);
+
+      display.clearDisplay();
+      drawMenu(display, menu, SH110X_WHITE, SH110X_BLACK, SH110X_BLACK, SH110X_WHITE);
+      display.display();
+    }
+
+    for (size_t i = 0; i < 6; i++)
+    {
+      delay(1000);
+      menu.scroll(-1);
+
+      display.clearDisplay();
+      drawMenu(display, menu, SH110X_WHITE, SH110X_BLACK, SH110X_BLACK, SH110X_WHITE);
+      display.display();
+    }
+  }
+  
 }
 
-void loop() {
+void loop(){
 
 }

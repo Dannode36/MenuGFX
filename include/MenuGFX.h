@@ -2,6 +2,12 @@
 #include <string>
 #include <Adafruit_GFX.h>
 
+#define ELEMENT_SPACING 4
+#define FONT_HEIGHT 8
+#define TITLE_HEIGHT (FONT_HEIGHT + 1)
+#define SCROLLBAR_WIDTH 3
+#define VALUE_OFFSET 5
+
 enum ValueType {
     VALUE_INT,
     VALUE_FLOAT,
@@ -48,16 +54,22 @@ struct MenuItem {
 struct Menu {
     const char* title;
     MenuItem* items;
-    uint8_t itemCount;
-    uint8_t selectedIndex;
-    struct Menu* parent;
-    uint16_t currentItem{};
+    uint16_t itemCount;
+    uint16_t selectedItem{};
     bool editing{};
+    struct Menu* parent;
 
-    uint16_t scrollVal{};
+    int16_t scrollVal{};
+    bool drawScrollBar{true};
     bool loopScroll{};
+    bool maintainSelection{};
+    bool clampScroll{};
 
-    void scroll(uint16_t scrollDelta);
+    /// @brief Scroll through the menu by a +/- amount of elements
+    /// @param scrollDelta Amount of scrolling to apply in number of elements
+    /// @param loopScroll Infinite scrolling effect. Loop from the last element back to the first
+    /// @param maintainSelection Don't change the selection to the nearest in-view element when it scrolls out of view
+    void scroll(int16_t scrollDelta);
 };
 
 void drawMenu(Adafruit_GFX& display, Menu& menu, uint16_t c, uint16_t bg, uint16_t selc, uint16_t selbg);
