@@ -28,6 +28,7 @@ struct MenuValue {
         float f;
         const char* s;
         struct Menu* submenu;
+        const EnumOption* options;
     };
 
     // Constraints for numeric types
@@ -37,10 +38,10 @@ struct MenuValue {
     bool posSign; //Print with sign prefix
 
     // For enumerated types
-    const EnumOption* options;
     uint8_t optionCount;
     uint8_t currentOption;
 
+    //For rendering purposes
     std::string prefix;
     std::string suffix;
 };
@@ -49,27 +50,39 @@ struct MenuItem {
     const char* name;
     MenuValue value;
     bool editable;
-
 };
+
 struct Menu {
-    const char* title;
+    const char* title; //Title bar text
     MenuItem* items;
     uint16_t itemCount;
-    uint16_t selectedItem{};
-    bool editing{};
+    uint16_t selectedItem{}; //Highlighted element
+    bool isEditing{}; //Highlight the value of the selected element
     struct Menu* parent;
 
     int16_t scrollVal{};
-    bool drawScrollBar{true};
-    bool loopScroll{};
-    bool maintainSelection{};
-    bool clampScroll{};
+    bool scrollBar{true};
+    bool loopScroll{}; //Infinite scrolling effect. Loop from the last element back to the first
+    bool maintainSelection{}; //Don't change the selection to the nearest in-view element when it scrolls out of view
+    bool clampScroll{}; // Clamp the last element in the menu to the bottom of the screen. Keeps the screen filled with elements 
+
+    uint16_t c; //Text colour (selction text background colour)
+    uint16_t bg; //Text background colour (selction text colour)
+    //uint16_t selc;
+    //uint16_t selbg;
 
     /// @brief Scroll through the menu by a +/- amount of elements
     /// @param scrollDelta Amount of scrolling to apply in number of elements
-    /// @param loopScroll Infinite scrolling effect. Loop from the last element back to the first
-    /// @param maintainSelection Don't change the selection to the nearest in-view element when it scrolls out of view
     void scroll(int16_t scrollDelta);
-};
 
-void drawMenu(Adafruit_GFX& display, Menu& menu, uint16_t c, uint16_t bg, uint16_t selc, uint16_t selbg);
+    /// @brief Draw the menu to a display
+    /// @param display Display to draw to
+    void draw(Adafruit_GFX& display);
+
+    /// @brief Used internally by the draw function
+    /// @param display Display to draw to
+    void drawScrollBar(Adafruit_GFX& display);
+
+    /// @brief Returns the currently selected MenuItem
+    MenuItem& getSelection();
+};

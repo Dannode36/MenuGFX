@@ -15,128 +15,129 @@ constexpr size_t size(T (&)[N]) { return N; }
 
 void setup()   {
 
-  Serial.begin(9600);
+    Serial.begin(9600);
 
-  EnumOption frequencyOptions[]{
-    {.label = {"868MHz", }, .numericValue = 868},
-    {.label = {"915MHz", }, .numericValue = 915}
-  };
+    EnumOption frequencyOptions[]{
+        {.label = {"868MHz", }, .numericValue = 868},
+        {.label = {"915MHz", }, .numericValue = 915}
+    };
 
-  MenuValue idValue{
-    .type = VALUE_INT,
-    .i = 0,
-    .minVal = 0,
-    .maxVal = MAXFLOAT,
-    .step = 1,
-  };
+    EnumOption rfStatusOptions[]{
+        {.label = {"On", }, .numericValue = 1},
+        {.label = {"Off", }, .numericValue = 0}
+    };
 
-  MenuValue frequencyValue{
-    .type = VALUE_ENUM,
-    .options = frequencyOptions,
-    .optionCount = size(frequencyOptions),
-    .currentOption = 1
-  };
+    MenuValue idValue{
+        .type = VALUE_INT,
+        .i = 0,
+        .minVal = 0,
+        .maxVal = MAXFLOAT,
+        .step = 1,
+    };
 
-  EnumOption rfStatusOptions[]{
-    {.label = {"On", }, .numericValue = 1},
-    {.label = {"Off", }, .numericValue = 0}
-  };
+    MenuValue frequencyValue{
+        .type = VALUE_ENUM,
+        .options = frequencyOptions,
+        .optionCount = size(frequencyOptions),
+        .currentOption = 1
+    };
 
-  MenuValue rfStatusValue{
-    .type = VALUE_ENUM,
-    .options = rfStatusOptions,
-    .optionCount = size(rfStatusOptions),
-    .currentOption = 0
-  };
+    MenuValue rfStatusValue{
+        .type = VALUE_ENUM,
+        .options = rfStatusOptions,
+        .optionCount = size(rfStatusOptions),
+        .currentOption = 0
+    };
 
-  MenuValue powerValue{
-    .type = VALUE_INT,
-    .i = 13,
-    .minVal = 2,
-    .maxVal = 20,
-    .step = 1,
-    .posSign = true,
-    .suffix = "dBm"
-  };
+    MenuValue powerValue{
+        .type = VALUE_INT,
+        .i = 13,
+        .minVal = 2,
+        .maxVal = 20,
+        .step = 1,
+        .posSign = true,
+        .suffix = "dBm"
+    };
 
-  MenuValue displayBrightnessValue{
-    .type = VALUE_INT,
-    .i = 100,
-    .minVal = 5,
-    .maxVal = 100,
-    .step = 5,
-    .suffix = "%"
-  };
+    MenuValue displayBrightnessValue{
+        .type = VALUE_INT,
+        .i = 100,
+        .minVal = 5,
+        .maxVal = 100,
+        .step = 5,
+        .suffix = "%"
+    };
 
-  MenuValue subMenuValue{
-    .type = VALUE_MENU,
-    .submenu = nullptr,
-    .suffix = "->",
-  };
+    MenuValue subMenuValue{
+        .type = VALUE_MENU,
+        .submenu = nullptr,
+        .suffix = "->",
+    };
 
-  MenuValue backMenuValue{
-    .type = VALUE_MENU,
-    .submenu = nullptr,
-    .suffix = "<-",
-  };
-  
-  MenuItem items[]{
-    {.name = "Back", .value = backMenuValue},
-    {.name = "RF ID", .value = idValue, .editable = true},
-    {.name = "Frequency", .value = frequencyValue, .editable = true},
-    {.name = "TX Power", .value = powerValue, .editable = true},
-    {.name = "RF Status", .value = rfStatusValue, .editable = true},
-    {.name = "Brightness", .value = displayBrightnessValue, .editable = true},
-    {.name = "More options", .value = subMenuValue}
-  };
+    MenuValue backMenuValue{
+        .type = VALUE_MENU,
+        .submenu = nullptr,
+        .suffix = "<-",
+    };
 
-  Menu menu {
-    .title = "Options",
-    .items = items,
-    .itemCount = size(items),
-    .selectedItem = 1,
-    .scrollVal = 1,
-    .clampScroll = true,
-  };
+    MenuItem items[]{
+        {.name = "Back", .value = backMenuValue},
+        {.name = "RF ID", .value = idValue, .editable = true},
+        {.name = "Frequency", .value = frequencyValue, .editable = true},
+        {.name = "TX Power", .value = powerValue, .editable = true},
+        {.name = "RF Status", .value = rfStatusValue, .editable = true},
+        {.name = "Brightness", .value = displayBrightnessValue, .editable = true},
+        {.name = "Brightness", .value = displayBrightnessValue, .editable = true},
+        {.name = "More options", .value = subMenuValue}
+    };
 
-  delay(250); // wait for the OLED to power up
-  display.begin(i2c_Address, true); // Address 0x3C default
-  //display.setContrast (0); // dim display
-  display.clearDisplay();
-  drawMenu(display, menu, SH110X_WHITE, SH110X_BLACK, SH110X_BLACK, SH110X_WHITE);
-  display.display();
+    Menu menu {
+        .title = "Options",
+        .items = items,
+        .itemCount = size(items),
+        .selectedItem = 1,
+        .scrollVal = 1,
+        .clampScroll = true,
+        .c = SH110X_WHITE,
+        .bg = SH110X_BLACK
+    };
 
-  
-  while (true)
-  {
-      // delay(1000);
-      // menu.scroll(1);
+    delay(250); // wait for the OLED to power up
+    display.begin(i2c_Address, true); // Address 0x3C default
+    //display.setContrast (0); // dim display
+    display.clearDisplay();
+    menu.draw(display);
+    display.display();
 
-      // display.clearDisplay();
-      // drawMenu(display, menu, SH110X_WHITE, SH110X_BLACK, SH110X_BLACK, SH110X_WHITE);
-      // display.display();
 
-    for (size_t i = 0; i < 6; i++)
+    while (true)
     {
-      delay(1000);
-      menu.scroll(1);
+        // delay(1000);
+        // menu.scroll(1);
 
-      display.clearDisplay();
-      drawMenu(display, menu, SH110X_WHITE, SH110X_BLACK, SH110X_BLACK, SH110X_WHITE);
-      display.display();
+        // display.clearDisplay();
+        // menu.draw(display);
+        // display.display();
+
+        for (size_t i = 0; i < 6; i++)
+        {
+            delay(1000);
+            menu.scroll(1);
+            display.clearDisplay();
+            menu.draw(display);
+            display.display();
+        }
+
+        for (size_t i = 0; i < 6; i++)
+        {
+            delay(1000);
+            menu.scroll(-1);
+
+            display.clearDisplay();
+            menu.draw(display);
+            display.display();
+        }
     }
-
-    for (size_t i = 0; i < 6; i++)
-    {
-      delay(1000);
-      menu.scroll(-1);
-
-      display.clearDisplay();
-      drawMenu(display, menu, SH110X_WHITE, SH110X_BLACK, SH110X_BLACK, SH110X_WHITE);
-      display.display();
-    }
-  }
-  
 }
 
 void loop(){
