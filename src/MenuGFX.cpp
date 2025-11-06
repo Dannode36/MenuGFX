@@ -130,36 +130,68 @@ void Menu::draw(Adafruit_GFX& display)
 
 void Menu::scroll(int16_t scrollDelta)
 {
-    scrollVal += scrollDelta;
+    if(isEditing){
+        auto& item = items[selectedItem];
+        if(item.editable){
+            auto& value = item.value;
 
-    if(scrollVal >= itemCount){
-        if(loopScroll){
-            while (scrollVal >= itemCount) //Should only loop once unless scrollDelta is massive (>itemCount)
+            switch (item.value.type)
             {
-                scrollVal -= itemCount; 
+            case VALUE_INT:
+                value.i += scrollDelta * value.step;
+                value.i = std::clamp(value.i, (int)value.minVal, (int)value.maxVal);
+                break;
+            case VALUE_FLOAT:
+                value.f += scrollDelta * value.step;
+                value.f = std::clamp(value.f, value.minVal, value.maxVal);
+                break;
+            case VALUE_STRING:
+                //TODO: String editor
+                isEditing = false; //Fallback
+                Serial.println("String option activated. No action taken");
+                return;
+            case VALUE_ENUM:
+                {
+                    int16_t newOption = (int16_t)value.currentOption + scrollDelta;
+
+                    if(loopScroll){
+                        value.currentOption = std::clamp(newOption, (int16_t)0, (int16_t)(value.optionCount - 1));
+                    }
+                    else{
+                        value.currentOption = std::clamp(newOption, (int16_t)0, (int16_t)(value.optionCount - 1));
+                    }
+                }
+                break;
+            case VALUE_MENU:
+                isEditing = false; //Fallback
+                Serial.println("Menu option activated. No action taken");
+                return;
+            default:
+                break;
             }
         }
-        else{
-            scrollVal = itemCount - 1; //Clamp value
-        }
     }
-    else if (scrollVal < 0){
+    else{
+        scrollVal += scrollDelta;
+
         if(loopScroll){
-            while (scrollVal < 0) //Should only loop once unless scrollDelta is massive (>itemCount)
-            {
-                scrollVal += itemCount; 
+            scrollVal = scrollVal % itemCount; //Loop scrolling implementation using modulo
+        }
+        else{
+            if(scrollVal >= itemCount){
+                scrollVal = itemCount - 1;
+            }
+            else if (scrollVal < 0){
+                scrollVal = 0;
             }
         }
-        else{
-            scrollVal = 0; //Clamp value
+
+        //TODO: This could be smarter and allow the cursor to "push the view", 
+        //      e.g scrolling outside of the currently displayed items moves the view in that direction.
+
+        //Recalculate selection to be on screen
+        if(!maintainSelection){
+            selectedItem = scrollVal;
         }
-    }
-
-    //TODO: This could be smarter and allow the cursor to "push the view", 
-    //      e.g scrolling outside of the currently displayed items moves the view in that direction.
-
-    //Recalculate selection to be on screen
-    if(!maintainSelection){
-        selectedItem = scrollVal;
     }
 }
