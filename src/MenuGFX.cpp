@@ -5,29 +5,30 @@ const uint16_t howManyElementsCanFitOnScreen(const Adafruit_GFX& display){
 }
 
 void printValue(Adafruit_GFX& display, const MenuValue& value, uint8_t rightOffset){
-
     std::string s;
-    switch (value.type)
+    auto& data = value.data;
+
+    switch (data.type)
     {
     case VALUE_INT:
         s += value.prefix;
-        if (value.posSign && value.i > 0){
+        if (value.posSign && data.i > 0){
             s += '+';
         }
-        s += std::to_string(value.i) + value.suffix;
+        s += std::to_string(data.i) + value.suffix;
         break;
     case VALUE_FLOAT:
         s += value.prefix;
-        if (value.posSign && value.f > 0){
+        if (value.posSign && data.f > 0){
             s += '+';
         }
-        s += std::to_string(value.f) + value.suffix;
+        s += std::to_string(data.f) + value.suffix;
         break;
     case VALUE_STRING:
-        s = value.s;
+        s = data.s;
         break;
     case VALUE_ENUM:
-        s = value.options[value.currentOption].label;
+        s = data.options[value.currentOption].label;
         break;
     case VALUE_MENU:
         s = value.prefix + value.suffix;
@@ -130,68 +131,27 @@ void Menu::draw(Adafruit_GFX& display)
 
 void Menu::scroll(int16_t scrollDelta)
 {
-    if(isEditing){
-        auto& item = items[selectedItem];
-        if(item.editable){
-            auto& value = item.value;
+    if(isEditing){ return; }
 
-            switch (item.value.type)
-            {
-            case VALUE_INT:
-                value.i += scrollDelta * value.step;
-                value.i = std::clamp(value.i, (int)value.minVal, (int)value.maxVal);
-                break;
-            case VALUE_FLOAT:
-                value.f += scrollDelta * value.step;
-                value.f = std::clamp(value.f, value.minVal, value.maxVal);
-                break;
-            case VALUE_STRING:
-                //TODO: String editor
-                isEditing = false; //Fallback
-                Serial.println("String option activated. No action taken");
-                return;
-            case VALUE_ENUM:
-                {
-                    int16_t newOption = (int16_t)value.currentOption + scrollDelta;
+    scrollVal += scrollDelta;
 
-                    if(loopScroll){
-                        value.currentOption = std::clamp(newOption, (int16_t)0, (int16_t)(value.optionCount - 1));
-                    }
-                    else{
-                        value.currentOption = std::clamp(newOption, (int16_t)0, (int16_t)(value.optionCount - 1));
-                    }
-                }
-                break;
-            case VALUE_MENU:
-                isEditing = false; //Fallback
-                Serial.println("Menu option activated. No action taken");
-                return;
-            default:
-                break;
-            }
-        }
+    if(loopScroll){
+        scrollVal = scrollVal % itemCount; //Loop scrolling implementation using modulo
     }
     else{
-        scrollVal += scrollDelta;
-
-        if(loopScroll){
-            scrollVal = scrollVal % itemCount; //Loop scrolling implementation using modulo
+        if(scrollVal >= itemCount){
+            scrollVal = itemCount - 1;
         }
-        else{
-            if(scrollVal >= itemCount){
-                scrollVal = itemCount - 1;
-            }
-            else if (scrollVal < 0){
-                scrollVal = 0;
-            }
+        else if (scrollVal < 0){
+            scrollVal = 0;
         }
+    }
 
-        //TODO: This could be smarter and allow the cursor to "push the view", 
-        //      e.g scrolling outside of the currently displayed items moves the view in that direction.
+    //TODO: This could be smarter and allow the cursor to "push the view", 
+    //      e.g scrolling outside of the currently displayed items moves the view in that direction.
 
-        //Recalculate selection to be on screen
-        if(!maintainSelection){
-            selectedItem = scrollVal;
-        }
+    //Recalculate selection to be on screen
+    if(!maintainSelection){
+        selectedItem = scrollVal;
     }
 }

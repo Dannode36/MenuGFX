@@ -21,7 +21,7 @@ struct EnumOption {
     float numericValue;  // could represent int/float meaningfully
 };
 
-struct MenuValue {
+struct ValueData{
     ValueType type;
     union {
         int i;
@@ -30,6 +30,10 @@ struct MenuValue {
         struct Menu* submenu;
         const EnumOption* options;
     };
+};
+
+struct MenuValue {
+    ValueData data;
 
     // Constraints for numeric types
     float minVal;
@@ -44,6 +48,8 @@ struct MenuValue {
     //For rendering purposes
     std::string prefix;
     std::string suffix;
+
+    std::function<void(int)> onChange;
 };
 
 struct MenuItem {
