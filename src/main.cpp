@@ -268,30 +268,30 @@ void drawInterface(){
     }
     else{
         int16_t length = 3 * signalStengthIndex + 1;
-        drawBitmapVFlipped(1, 0, SSI, 10, 10, length, length, SH110X_WHITE);
+        drawBitmapVFlipped(1, 1, SSI, 10, 10, length, length, SH110X_WHITE);
     }
 
     //Draw battery level indicator
     uint8_t quantizedBattLevel = 1;
-    display.drawRoundRect(103, 1, 22, 10, 1, SH110X_WHITE);
-    display.drawFastVLine(125, 4, 4, SH110X_WHITE);
+    display.drawRoundRect(103, 3, 23, 9, 1, SH110X_WHITE);
+    display.drawFastVLine(126, 6, 3, SH110X_WHITE);
 
     for (size_t i = 0; i < quantizedBattLevel; i++)
     {
-        display.fillRect(105 + (4 * i), 3, 3, 6, SH110X_WHITE);
+        display.fillRect(105 + (4 * i), 5, 3, 5, SH110X_WHITE);
     }
 
     //Draw toolbar divider line
-    display.drawFastHLine(0, 12, display.width(), SH110X_WHITE);
+    display.drawFastHLine(0, 15, display.width(), SH110X_WHITE);
 
     //Draw speed value
-    float speed = 2;
+    float speed = 5;
     speed = speed * (config.units == UNIT_METRIC ? 3.6f :  2.237f); //Convert from m/s to configured unit
     std::stringstream stream;
     stream << std::fixed << std::setprecision(1) << speed;
     std::string speedStr = stream.str();
 
-    display.setTextSize(4);
+    display.setTextSize(4); //24x32
     display.setTextColor(SH110X_WHITE);
 
     int16_t speed_x1;
