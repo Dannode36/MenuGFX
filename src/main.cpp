@@ -42,8 +42,8 @@ EnumOption frequencyOptions[]{
 };
 
 EnumOption rfStatusOptions[]{
-    {.label = {"On", }, .numericValue = 1},
-    {.label = {"Off", }, .numericValue = 0}
+    {.label = {"Off", }, .numericValue = 0},
+    {.label = {"On", }, .numericValue = 1}
 };
 
 EnumOption displayUnitsOptions[]{
@@ -76,7 +76,7 @@ MenuValue rfStatusValue{
         .options = rfStatusOptions
     },
     .optionCount = size(rfStatusOptions),
-    .currentOption = 0
+    .currentOption = 1
 };
 
 MenuValue powerValue{
@@ -332,9 +332,12 @@ uint32_t lastDebounceTime = 0;
 uint32_t debounceDelay = 50; //millis
 void encSwHandler(){
     if ((millis() - lastDebounceTime) > debounceDelay){
+        if(activeMenu == nullptr){ //Activate menu
+            activeMenu = &menu;
+        }
 
-        if(menu.getSelection().editable){
-            menu.isEditing = !menu.isEditing;
+        if(activeMenu->getSelection().editable){
+            activeMenu->isEditing = !activeMenu->isEditing;
         }
         drawMenu();
         
