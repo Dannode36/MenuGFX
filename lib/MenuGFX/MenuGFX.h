@@ -92,3 +92,31 @@ struct Menu {
     /// @brief Returns the currently selected MenuItem
     MenuItem& getSelection();
 };
+
+inline MenuValue IntValue(int initial, float min, float max, float step = 1, bool posSign = false, const char* suffix = nullptr) {
+    MenuValue mv{};
+    mv.data.type = VALUE_INT;
+    mv.data.i = initial;
+    mv.minVal = min;
+    mv.maxVal = max;
+    mv.step   = step;
+    mv.posSign = posSign;
+    mv.suffix = suffix;
+    return mv;
+}
+
+inline MenuValue EnumValue(const EnumOption* options, size_t count, int current = 0) {
+    MenuValue mv{};
+    mv.data.type = VALUE_ENUM;
+    mv.data.options = options;
+    mv.optionCount = count;
+    mv.currentOption = current;
+    return mv;
+}
+
+inline MenuValue SubmenuValue(const char* text = "->"){
+    MenuValue mv{};
+    mv.data.type = VALUE_MENU;
+    mv.suffix = text;
+    return mv;
+}

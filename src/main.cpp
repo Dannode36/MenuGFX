@@ -33,6 +33,11 @@ enum Units : uint8_t{
 };
 
 struct Config{
+    uint16_t rfid;
+    uint8_t frequency;
+    uint8_t power;
+    bool txStatus;
+    uint8_t tftBrightness;
     Units units = UNIT_METRIC;
 } config;
 
@@ -47,95 +52,19 @@ EnumOption rfStatusOptions[]{
 };
 
 EnumOption displayUnitsOptions[]{
-    {.label = {"Metric"}, .numericValue = 0},
-    {.label = {"Imperial"}, .numericValue = 1}
-};
-
-MenuValue idValue{
-    .data = ValueData { 
-        .type = VALUE_INT, 
-        .i = 0
-    },
-    .minVal = 0,
-    .maxVal = MAXFLOAT,
-    .step = 1,
-};
-
-MenuValue frequencyValue{
-    .data = ValueData { 
-        .type = VALUE_ENUM, 
-        .options = frequencyOptions
-    },
-    .optionCount = size(frequencyOptions),
-    .currentOption = 1
-};
-
-MenuValue rfStatusValue{
-    .data = ValueData { 
-        .type = VALUE_ENUM, 
-        .options = rfStatusOptions
-    },
-    .optionCount = size(rfStatusOptions),
-    .currentOption = 1
-};
-
-MenuValue powerValue{
-    .data = ValueData { 
-        .type = VALUE_INT, 
-        .i = 13
-    },
-    .minVal = 2,
-    .maxVal = 20,
-    .step = 1,
-    .posSign = true,
-    .suffix = "dBm"
-};
-
-MenuValue displayBrightnessValue{
-    .data = ValueData { 
-        .type = VALUE_INT, 
-        .i = 100
-    },
-    .minVal = 5,
-    .maxVal = 100,
-    .step = 5,
-    .suffix = "%"
-};
-
-MenuValue displayUnitsValue{
-    .data = ValueData { 
-        .type = VALUE_ENUM, 
-        .options = displayUnitsOptions
-    },
-    .optionCount = size(displayUnitsOptions),
-    .currentOption = 0
-};
-
-MenuValue subMenuValue{
-    .data = ValueData { 
-        .type = VALUE_MENU, 
-        .submenu = nullptr
-    },
-    .suffix = "->",
-};
-
-MenuValue backMenuValue{
-    .data = ValueData { 
-        .type = VALUE_MENU, 
-        .submenu = nullptr
-    },
-    .suffix = "<-",
+    {.label = {"Metric"}, .numericValue = UNIT_METRIC},
+    {.label = {"Imperial"}, .numericValue = UNIT_IMPERIAL}
 };
 
 MenuItem items[]{
-    {.name = "Back", .value = backMenuValue},
-    {.name = "RF ID", .value = idValue, .editable = true},
-    {.name = "Frequency", .value = frequencyValue, .editable = true},
-    {.name = "TX Power", .value = powerValue, .editable = true},
-    {.name = "RF Status", .value = rfStatusValue, .editable = true},
-    {.name = "Brightness", .value = displayBrightnessValue, .editable = true},
-    {.name = "Units", .value = displayUnitsValue, .editable = true},
-    {.name = "More options", .value = subMenuValue}
+    {"Back",            SubmenuValue("<-")},
+    {"RF ID",           IntValue(0, 0, UINT16_MAX), true},
+    {"Frequency",       EnumValue(frequencyOptions, size(frequencyOptions), 1), true},
+    {"TX Power",        IntValue(13, 2, 20, 1, true, "dBm"), true},
+    {"TX Status",       EnumValue(rfStatusOptions, size(rfStatusOptions), 1), true},
+    {"Brightness",      IntValue(100, 5, 100, 5, false, "%"), true},
+    {"Units",           EnumValue(displayUnitsOptions, size(displayUnitsOptions)), true},
+    {"More options",    SubmenuValue()}
 };
 
 Menu menu {
